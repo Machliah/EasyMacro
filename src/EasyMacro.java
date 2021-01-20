@@ -3,24 +3,35 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.Scanner;
 
 public class EasyMacro implements ActionListener {
 
     JFrame window = new JFrame("EasyMacro");
-    JButton pauseButton = new JButton("Reset");
-    JButton playButton = new JButton("Reset");
-    JButton stopButton = new JButton("Reset");
-    JButton[][] gameButtons = new JButton[20][20];
 
-    Container UI = new Container();
-    Container buttons = new Container();
+    Container functions = new Container();
+    Container timeline = new Container();
+    Container addAction = new Container();
 
-    int[][] board = new int[20][20];
-    boolean won = false;
-    final int BLANK = 0;
-    final int BOMB = 1;
-    final int BOMBS = 40;
+    JButton pauseButton = new JButton("Pause");
+    JButton playButton = new JButton("Play");
+    JButton stopButton = new JButton("Stop");
+    JButton moveUp = new JButton("Up");
+    JButton moveDown = new JButton("Down");
+    JButton remove = new JButton("Remove");
+    JTextField xMouseCoord = new JTextField("X");
+    JLabel coordsXLabel = new JLabel("X");
+    JTextField yMouseCoord = new JTextField("Y");
+    JComboBox clickType = new JComboBox();
+    JButton addMouseClick = new JButton("Add Mouse Click");
+    JTextField keyPressKey = new JTextField("Key");
+    JButton addKeyPress = new JButton("Add Key Press");
+    JTextField keyReleaseKey = new JTextField("Key");
+    JButton addKeyRelease = new JButton("Add Key Release");
+    JTextField delayTime = new JTextField("0.0");
+    JButton addDelay = new JButton("Add Delay");
+
     Scanner userInput = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -31,28 +42,46 @@ public class EasyMacro implements ActionListener {
 
         userInput.useDelimiter("\\n");
 
-        window.setSize(900,1000);
+        window.setSize(1000,1100);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
 
-        // Buttons layout
-        buttons.setLayout(new GridLayout(20,20));
-        for (int row = 0; row < gameButtons.length; row++) {
-            for (int column = 0; column < gameButtons[0].length; column++) {
-                gameButtons[column][row] = new JButton();
-                buttons.add(gameButtons[column][row]);
-                gameButtons[column][row].addActionListener(this);
-            }
-        }
-        window.add(buttons, BorderLayout.CENTER);
+        // Actions buttons
+        functions.setLayout(new GridLayout(2,3));
+        // Playback buttons layout
+        functions.add(pauseButton);
+        pauseButton.addActionListener(this);
+        functions.add(playButton);
+        playButton.addActionListener(this);
+        functions.add(stopButton);
+        stopButton.addActionListener(this);
 
-        // Scores layout
-        UI.setLayout(new GridLayout(1,1));
-        UI.add(resetGame);
-        resetGame.addActionListener(this);
-        window.add(UI, BorderLayout.NORTH);
+        // Order change buttons layout
+        functions.add(moveUp);
+        moveUp.addActionListener(this);
+        functions.add(moveDown);
+        moveDown.addActionListener(this);
+        functions.add(remove);
+        remove.addActionListener(this);
 
-        reset();
+        window.add(functions, BorderLayout.NORTH);
+
+        // Add functions layout
+        addAction.setLayout(new GridLayout(4,5));
+        // Add mouse click layout
+        addAction.add(xMouseCoord);
+        xMouseCoord.addActionListener(this);
+        addAction.add(coordsXLabel);
+        coordsXLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        addAction.add(yMouseCoord);
+        yMouseCoord.addActionListener(this);
+        addAction.add(clickType);
+        addAction.add(addMouseClick);
+        addMouseClick.addActionListener(this);
+
+        // Add key press layout
+
+        window.add(addAction, BorderLayout.SOUTH);
 
         window.setVisible(true);
 
