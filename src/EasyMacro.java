@@ -8,11 +8,19 @@ import java.util.Scanner;
 
 public class EasyMacro implements ActionListener {
 
+    String[] mouseClickTypes = {"Left Click","Right Click","Middle Click"};
+
     JFrame window = new JFrame("EasyMacro");
 
-    Container functions = new Container();
+    Container playback = new Container();
+    Container timelineList = new Container();
+    Container changeOrder = new Container();
+    Container mouseClick = new Container();
+    Container keyPress = new Container();
+    Container keyRelease = new Container();
+    Container delay = new Container();
     Container timeline = new Container();
-    Container addAction = new Container();
+    Container buttons = new Container();
 
     JButton pauseButton = new JButton("Pause");
     JButton playButton = new JButton("Play");
@@ -23,7 +31,7 @@ public class EasyMacro implements ActionListener {
     JTextField xMouseCoord = new JTextField("X");
     JLabel coordsXLabel = new JLabel("X");
     JTextField yMouseCoord = new JTextField("Y");
-    JComboBox clickType = new JComboBox();
+    JComboBox clickType = new JComboBox(mouseClickTypes);
     JButton addMouseClick = new JButton("Add Mouse Click");
     JTextField keyPressKey = new JTextField("Key");
     JButton addKeyPress = new JButton("Add Key Press");
@@ -31,6 +39,7 @@ public class EasyMacro implements ActionListener {
     JButton addKeyRelease = new JButton("Add Key Release");
     JTextField delayTime = new JTextField("0.0");
     JButton addDelay = new JButton("Add Delay");
+    JPanel blank = new JPanel();
 
     Scanner userInput = new Scanner(System.in);
 
@@ -42,46 +51,93 @@ public class EasyMacro implements ActionListener {
 
         userInput.useDelimiter("\\n");
 
-        window.setSize(1000,1100);
+        window.setSize(700,800);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
 
         // Actions buttons
-        functions.setLayout(new GridLayout(2,3));
+        playback.setLayout(new GridLayout(1,9));
+
         // Playback buttons layout
-        functions.add(pauseButton);
+
+        playback.add(pauseButton);
+        playback.add(playButton);
+        playback.add(stopButton);
+
         pauseButton.addActionListener(this);
-        functions.add(playButton);
         playButton.addActionListener(this);
-        functions.add(stopButton);
         stopButton.addActionListener(this);
 
+        window.add(playback, BorderLayout.NORTH);
+
+        // Timeline layout
+        timeline.setLayout(new BorderLayout());
+
         // Order change buttons layout
-        functions.add(moveUp);
+        changeOrder.setLayout(new GridLayout(1,3));
+
+        changeOrder.add(moveUp);
+        changeOrder.add(moveDown);
+        changeOrder.add(remove);
+
         moveUp.addActionListener(this);
-        functions.add(moveDown);
         moveDown.addActionListener(this);
-        functions.add(remove);
         remove.addActionListener(this);
 
-        window.add(functions, BorderLayout.NORTH);
+        timeline.add(changeOrder, BorderLayout.SOUTH);
+
+        window.add(timeline, BorderLayout.CENTER);
 
         // Add functions layout
-        addAction.setLayout(new GridLayout(4,5));
+        buttons.setLayout(new GridLayout(4,0));
+
         // Add mouse click layout
-        addAction.add(xMouseCoord);
+        mouseClick.setLayout(new GridLayout(1,5));
+
+        mouseClick.add(xMouseCoord);
+        mouseClick.add(coordsXLabel);
+        mouseClick.add(yMouseCoord);
+        mouseClick.add(clickType);
+        mouseClick.add(addMouseClick);
+
         xMouseCoord.addActionListener(this);
-        addAction.add(coordsXLabel);
         coordsXLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        addAction.add(yMouseCoord);
         yMouseCoord.addActionListener(this);
-        addAction.add(clickType);
-        addAction.add(addMouseClick);
         addMouseClick.addActionListener(this);
 
-        // Add key press layout
+        buttons.add(mouseClick,0);
 
-        window.add(addAction, BorderLayout.SOUTH);
+        // Add key press layout
+        keyPress.setLayout(new GridLayout(1,5));
+
+        keyPress.add(keyPressKey);
+        keyPress.add(addKeyPress);
+
+        addKeyPress.addActionListener(this);
+
+        buttons.add(keyPress,1);
+
+        // Add key release layout
+        keyRelease.setLayout(new GridLayout(1,5));
+
+        keyRelease.add(keyReleaseKey);
+        keyRelease.add(addKeyRelease);
+
+        addKeyRelease.addActionListener(this);
+
+        buttons.add(keyRelease,2);
+
+        // Add delay layout
+        delay.setLayout(new GridLayout(1,5));
+
+        delay.add(delayTime);
+        delay.add(addDelay);
+
+        addDelay.addActionListener(this);
+
+        buttons.add(delay,3);
+
+        window.add(buttons, BorderLayout.SOUTH);
 
         window.setVisible(true);
 
