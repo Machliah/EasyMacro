@@ -1,4 +1,7 @@
+import javax.crypto.Mac;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,10 +11,14 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.Scanner;
 
-public class EasyMacro implements ActionListener, FocusListener {
+public class EasyMacro implements ActionListener, ListSelectionListener {
 
     String[] mouseClickTypes = {"Left Click","Right Click","Middle Click"};
-    String[] timelineActions = {"Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Left Click","Right Click","Middle Click","Right Click","Middle Click","Right Click","Middle Click","Right Click",};
+
+    ArrayList<MacroEvent> macroEventsList = new ArrayList<>();
+    DefaultListModel actionTypesTimeline = new DefaultListModel();
+
+    int selected;
 
     JFrame window = new JFrame("EasyMacro");
 
@@ -28,7 +35,7 @@ public class EasyMacro implements ActionListener, FocusListener {
     JButton pauseButton = new JButton("Pause");
     JButton playButton = new JButton("Play");
     JButton stopButton = new JButton("Stop");
-    JList timelineActionList = new JList(timelineActions);
+    JList timelineActionList;
     JScrollPane scrollTimeline = new JScrollPane(timelineActionList);
     JButton moveUp = new JButton("Up");
     JButton moveDown = new JButton("Down");
@@ -59,6 +66,17 @@ public class EasyMacro implements ActionListener, FocusListener {
         for (int i = 0; i < 30; i++) {
             blank[i] = new JPanel();
         }
+
+        macroEventsList.add(new MacroEvent("delay",5));
+        macroEventsList.add(new MacroEvent("key press",6));
+        macroEventsList.add(new MacroEvent("key release",7));
+        macroEventsList.add(new MacroEvent("mouse click",8,'f'));
+
+        for (int i = 0; i < macroEventsList.size(); i++) {
+            actionTypesTimeline.addElement(macroEventsList.get(i).getActionType());
+        }
+
+        timelineActionList.setModel(actionTypesTimeline);
 
         buildWindow();
 
@@ -96,6 +114,7 @@ public class EasyMacro implements ActionListener, FocusListener {
         scrollTimeline.setViewportView(timelineActionList);
 
         timelineActionList.setLayoutOrientation(JList.VERTICAL);
+        timelineActionList.addListSelectionListener(this);
 
         timelineList.add(scrollTimeline);
         timeline.add(timelineList);
@@ -191,18 +210,31 @@ public class EasyMacro implements ActionListener, FocusListener {
 
     }
 
+    public void removeAction() {
+
+        macroEventsList.remove(selected);
+        timelineActionList.setModel(actionTypesTimeline);
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        if (e.getSource().equals(remove)) {
+            removeAction();
+        }
+
     }
 
     @Override
-    public void focusGained(FocusEvent e) {
+    public void valueChanged(ListSelectionEvent e) {
+
+        for (int i = 0; i < macroEventsList.size(); i++) {
+            if (e.getSource().equals(macroEventsList.get(i))) {
+                selected = i;
+            }
+        }
 
     }
 
-    @Override
-    public void focusLost(FocusEvent e) {
-
-    }
 }
