@@ -1,2 +1,3 @@
 # EasyMacro
-Basic Java macro maker for school project.
+
+Basic macro creation tool designed in Java for a school project.
