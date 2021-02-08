@@ -5,7 +5,7 @@ public class MacroEvent {
 
     // Delay
 
-    public MacroEvent(String actionType, int delay) {
+    public MacroEvent(String actionType, double delay) {
 
         mActionType = actionType;
 
@@ -13,7 +13,7 @@ public class MacroEvent {
 
     // Key press/release
 
-    public MacroEvent(String actionType, int delay, char key) {
+    public MacroEvent(String actionType, char key) {
 
         mActionType = actionType;
 
@@ -21,7 +21,7 @@ public class MacroEvent {
 
     // Mouse click
 
-    public MacroEvent(String actionType, int delay, char key, int xCoord, int yCoord, int clickType) {
+    public MacroEvent(String actionType, int xCoord, int yCoord, int clickType) {
 
         mActionType = actionType;
 
