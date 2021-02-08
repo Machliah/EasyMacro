@@ -19,6 +19,7 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
     DefaultListModel actionTypesTimeline = new DefaultListModel();
 
     int selected;
+    Object swapping;
 
     JFrame window = new JFrame("EasyMacro");
 
@@ -68,15 +69,15 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
         }
 
         macroEventsList.add(new MacroEvent("delay",5));
-        macroEventsList.add(new MacroEvent("key press",6));
-        macroEventsList.add(new MacroEvent("key release",7));
-        macroEventsList.add(new MacroEvent("mouse click",8,'f'));
+        macroEventsList.add(new MacroEvent("key press",'g'));
+        macroEventsList.add(new MacroEvent("key release",'h'));
+        macroEventsList.add(new MacroEvent("mouse click",435,345,1));
 
         for (int i = 0; i < macroEventsList.size(); i++) {
             actionTypesTimeline.addElement(macroEventsList.get(i).getActionType());
         }
 
-        timelineActionList.setModel(actionTypesTimeline);
+        timelineActionList = new JList(actionTypesTimeline);
 
         buildWindow();
 
@@ -84,7 +85,7 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
 
     public void buildWindow() {
 
-        window.setSize(600,600);
+        window.setSize(700,600);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
 
@@ -114,6 +115,7 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
         scrollTimeline.setViewportView(timelineActionList);
 
         timelineActionList.setLayoutOrientation(JList.VERTICAL);
+        timelineActionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         timelineActionList.addListSelectionListener(this);
 
         timelineList.add(scrollTimeline);
@@ -213,7 +215,57 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
     public void removeAction() {
 
         macroEventsList.remove(selected);
-        timelineActionList.setModel(actionTypesTimeline);
+        actionTypesTimeline.remove(selected);
+
+    }
+
+    public void moveActionUp() {
+
+        swapping = macroEventsList.get(selected-1);
+        macroEventsList.set(selected-1, macroEventsList.get(selected));
+        macroEventsList.set(selected, (MacroEvent) swapping);
+        swapping = actionTypesTimeline.get(selected-1);
+        actionTypesTimeline.set(selected-1, actionTypesTimeline.get(selected));
+        actionTypesTimeline.set(selected, swapping);
+
+    }
+
+    public void moveActionDown() {
+
+        swapping = macroEventsList.get(selected+1);
+        macroEventsList.set(selected+1, macroEventsList.get(selected));
+        macroEventsList.set(selected, (MacroEvent) swapping);
+        swapping = actionTypesTimeline.get(selected+1);
+        actionTypesTimeline.set(selected+1, actionTypesTimeline.get(selected));
+        actionTypesTimeline.set(selected, swapping);
+
+    }
+
+    public void addMouseClick(int xCoord, int yCoord, int clickType) {
+
+        macroEventsList.add(new MacroEvent("mouse click", xCoord, yCoord, clickType));
+        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
+
+    }
+
+    public void addKeyPress(char key) {
+
+        macroEventsList.add(new MacroEvent("key press", key));
+        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
+
+    }
+
+    public void addKeyRelease(char key) {
+
+        macroEventsList.add(new MacroEvent("key release", key));
+        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
+
+    }
+
+    public void addDelay(double delay) {
+
+        macroEventsList.add(new MacroEvent("delay", delay));
+        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
 
     }
 
@@ -222,6 +274,28 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
 
         if (e.getSource().equals(remove)) {
             removeAction();
+        } else if (e.getSource().equals(moveUp)) {
+            moveActionUp();
+        } else if (e.getSource().equals(moveDown)) {
+            moveActionDown();
+        }
+
+        if (e.getSource().equals(addMouseClick)) {
+            try {
+                addMouseClick(Integer.parseInt(xMouseCoord.getText()), Integer.parseInt(yMouseCoord.getText()), clickType.getSelectedIndex());
+            } catch (Exception NumberFormatException) {
+                JDialog error = new JDialog(window, "Error!");
+                JLabel dialogLabel = new JLabel("Please enter valid mouse coordinates.", SwingConstants.CENTER);
+                error.add(dialogLabel);
+                error.setSize(300,100);
+                error.setVisible(true);
+            }
+        } else if (e.getSource().equals(addKeyPress)) {
+            addKeyPress(keyPressKey.getText().charAt(0));
+        } else if (e.getSource().equals(addKeyRelease)) {
+            addKeyRelease(keyReleaseKey.getText().charAt(0));
+        } else if (e.getSource().equals(addDelay)) {
+            addDelay(Double.parseDouble(delayTime.getText()));
         }
 
     }
@@ -229,9 +303,17 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
     @Override
     public void valueChanged(ListSelectionEvent e) {
 
-        for (int i = 0; i < macroEventsList.size(); i++) {
-            if (e.getSource().equals(macroEventsList.get(i))) {
-                selected = i;
+        if (!e.getValueIsAdjusting()) {
+
+            if (timelineActionList.getSelectedIndex() == -1) {
+                remove.setEnabled(false);
+                moveUp.setEnabled(false);
+                moveDown.setEnabled(false);
+            } else {
+                selected = timelineActionList.getSelectedIndex();
+                remove.setEnabled(true);
+                moveDown.setEnabled(true);
+                moveUp.setEnabled(true);
             }
         }
 
