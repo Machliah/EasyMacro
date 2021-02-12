@@ -13,7 +13,8 @@ import java.util.Scanner;
 
 public class EasyMacro implements ActionListener, ListSelectionListener {
 
-    String[] mouseClickTypes = {"Left Click","Right Click","Middle Click"};
+    String[] mouseButtonTypes = {"left button","right button","middle button"};
+    String[] pressOrRelease = {"Press","Release"};
 
     ArrayList<MacroEvent> macroEventsList = new ArrayList<>();
     DefaultListModel actionTypesTimeline = new DefaultListModel();
@@ -26,9 +27,8 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
     Container playback = new Container();
     Container timelineList = new Container();
     Container changeOrder = new Container();
-    Container mouseClick = new Container();
-    Container keyPress = new Container();
-    Container keyRelease = new Container();
+    Container mouseAction = new Container();
+    Container keyAction = new Container();
     Container delay = new Container();
     Container timeline = new Container();
     Container buttons = new Container();
@@ -44,12 +44,12 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
     JTextField xMouseCoord = new JTextField("X");
     JLabel coordsXLabel = new JLabel("X");
     JTextField yMouseCoord = new JTextField("Y");
-    JComboBox clickType = new JComboBox(mouseClickTypes);
-    JButton addMouseClick = new JButton("Add Mouse Click");
-    JTextField keyPressKey = new JTextField("Key");
-    JButton addKeyPress = new JButton("Add Key Press");
-    JTextField keyReleaseKey = new JTextField("Key");
-    JButton addKeyRelease = new JButton("Add Key Release");
+    JComboBox mouseButton = new JComboBox(mouseButtonTypes);
+    JComboBox mousePressOrRelease = new JComboBox(pressOrRelease);
+    JButton addMouseAction = new JButton("Add Mouse Click");
+    JTextField keyActionKey = new JTextField("Key");
+    JButton addKeyAction = new JButton("Add Key Press");
+    JComboBox keyPressOrRelease = new JComboBox(pressOrRelease);
     JTextField delayTime = new JTextField("0.0");
     JButton addDelay = new JButton("Add Delay");
     JPanel[] blank = new JPanel[30];
@@ -67,11 +67,6 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
         for (int i = 0; i < 30; i++) {
             blank[i] = new JPanel();
         }
-
-        macroEventsList.add(new MacroEvent("delay",5));
-        macroEventsList.add(new MacroEvent("key press",'g'));
-        macroEventsList.add(new MacroEvent("key release",'h'));
-        macroEventsList.add(new MacroEvent("mouse click",435,345,1));
 
         for (int i = 0; i < macroEventsList.size(); i++) {
             actionTypesTimeline.addElement(macroEventsList.get(i).getActionType());
@@ -141,70 +136,62 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
         window.add(timeline, BorderLayout.CENTER);
 
         // Add functions layout
-        buttons.setLayout(new GridLayout(4,0));
+        buttons.setLayout(new GridLayout(3,0));
 
         // Add mouse click layout
-        mouseClick.setLayout(new GridLayout(1,7));
+        mouseAction.setLayout(new GridLayout(1,7));
 
-        mouseClick.add(blank[6]);
-        mouseClick.add(xMouseCoord);
-        mouseClick.add(coordsXLabel);
-        mouseClick.add(yMouseCoord);
-        mouseClick.add(blank[7]);
-        mouseClick.add(clickType);
-        mouseClick.add(addMouseClick);
-        mouseClick.add(blank[8]);
+        mouseAction.add(blank[6]);
+        mouseAction.add(xMouseCoord);
+        mouseAction.add(coordsXLabel);
+        mouseAction.add(yMouseCoord);
+        mouseAction.add(mouseButton);
+        mouseAction.add(mousePressOrRelease);
+        mouseAction.add(addMouseAction);
+        mouseAction.add(blank[7]);
 
         xMouseCoord.setHorizontalAlignment(JTextField.CENTER);
         xMouseCoord.addActionListener(this);
         coordsXLabel.setHorizontalAlignment(SwingConstants.CENTER);
         yMouseCoord.setHorizontalAlignment(JTextField.CENTER);
         yMouseCoord.addActionListener(this);
-        addMouseClick.addActionListener(this);
+        addMouseAction.addActionListener(this);
 
-        buttons.add(mouseClick,0);
+        buttons.add(mouseAction,0);
 
-        // Add key press layout
-        keyPress.setLayout(new GridLayout(1,5));
+        // Add key action layout
+        keyAction.setLayout(new GridLayout(1,5));
 
-        keyPress.add(blank[13]);
-        keyPress.add(keyPressKey);
-        keyPress.add(blank[14]);
-        keyPress.add(addKeyPress);
-        keyPress.add(blank[15]);
+        keyAction.add(blank[13]);
+        keyAction.add(blank[22]);
+        keyAction.add(keyActionKey);
+        keyAction.add(blank[14]);
+        keyAction.add(blank[23]);
+        keyAction.add(keyPressOrRelease);
+        keyAction.add(addKeyAction);
+        keyAction.add(blank[15]);
 
-        keyPressKey.setHorizontalAlignment(JTextField.CENTER);
-        addKeyPress.addActionListener(this);
+        keyActionKey.setHorizontalAlignment(JTextField.CENTER);
+        addKeyAction.addActionListener(this);
 
-        buttons.add(keyPress,1);
-
-        // Add key release layout
-        keyRelease.setLayout(new GridLayout(1,5));
-
-        keyRelease.add(blank[16]);
-        keyRelease.add(keyReleaseKey);
-        keyRelease.add(blank[17]);
-        keyRelease.add(addKeyRelease);
-        keyRelease.add(blank[18]);
-
-        keyReleaseKey.setHorizontalAlignment(JTextField.CENTER);
-        addKeyRelease.addActionListener(this);
-
-        buttons.add(keyRelease,2);
+        buttons.add(keyAction,1);
 
         // Add delay layout
         delay.setLayout(new GridLayout(1,5));
 
         delay.add(blank[19]);
+        delay.add(blank[24]);
         delay.add(delayTime);
         delay.add(blank[20]);
+        delay.add(blank[25]);
+        delay.add(blank[26]);
         delay.add(addDelay);
         delay.add(blank[21]);
 
         delayTime.setHorizontalAlignment(JTextField.CENTER);
         addDelay.addActionListener(this);
 
-        buttons.add(delay,3);
+        buttons.add(delay,2);
 
         window.add(buttons, BorderLayout.SOUTH);
 
@@ -221,56 +208,83 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
 
     public void moveActionUp() {
 
-        swapping = macroEventsList.get(selected-1);
-        macroEventsList.set(selected-1, macroEventsList.get(selected));
-        macroEventsList.set(selected, (MacroEvent) swapping);
-        swapping = actionTypesTimeline.get(selected-1);
-        actionTypesTimeline.set(selected-1, actionTypesTimeline.get(selected));
-        actionTypesTimeline.set(selected, swapping);
+        try {
+            swapping = macroEventsList.get(selected - 1);
+            macroEventsList.set(selected - 1, macroEventsList.get(selected));
+            macroEventsList.set(selected, (MacroEvent) swapping);
+            swapping = actionTypesTimeline.get(selected - 1);
+            actionTypesTimeline.set(selected - 1, actionTypesTimeline.get(selected));
+            actionTypesTimeline.set(selected, swapping);
+        } catch (Exception ArrayIndexOutOfBoundsException) {
+            System.out.println("Can't move action up from here!");
+        }
 
     }
 
     public void moveActionDown() {
 
-        swapping = macroEventsList.get(selected+1);
-        macroEventsList.set(selected+1, macroEventsList.get(selected));
-        macroEventsList.set(selected, (MacroEvent) swapping);
-        swapping = actionTypesTimeline.get(selected+1);
-        actionTypesTimeline.set(selected+1, actionTypesTimeline.get(selected));
-        actionTypesTimeline.set(selected, swapping);
+        try {
+            swapping = macroEventsList.get(selected + 1);
+            macroEventsList.set(selected + 1, macroEventsList.get(selected));
+            macroEventsList.set(selected, (MacroEvent) swapping);
+            swapping = actionTypesTimeline.get(selected + 1);
+            actionTypesTimeline.set(selected + 1, actionTypesTimeline.get(selected));
+            actionTypesTimeline.set(selected, swapping);
+        } catch (Exception ArrayIndexOutOfBoundsException) {
+            System.out.println("Can't move action down from here!");
+        }
 
     }
 
-    public void addMouseClick(int xCoord, int yCoord, int clickType) {
+    public void addMouseAction(Object actionType, int xCoord, int yCoord, int mouseButtonN) {
 
-        macroEventsList.add(new MacroEvent("mouse click", xCoord, yCoord, clickType));
-        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
-
-    }
-
-    public void addKeyPress(char key) {
-
-        macroEventsList.add(new MacroEvent("key press", key));
-        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
+        macroEventsList.add(new MacroEvent((String) actionType, xCoord, yCoord, mouseButtonN+1));
+        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType() + " " + mouseButton.getSelectedItem());
 
     }
 
-    public void addKeyRelease(char key) {
+    public void addKeyAction(Object actionType, char key) {
 
-        macroEventsList.add(new MacroEvent("key release", key));
-        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
+        macroEventsList.add(new MacroEvent((String) actionType, key));
+        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType() + " '" + key + "'");
 
     }
 
     public void addDelay(double delay) {
 
         macroEventsList.add(new MacroEvent("delay", delay));
-        actionTypesTimeline.addElement(macroEventsList.get(macroEventsList.size()-1).getActionType());
+        actionTypesTimeline.addElement(delay + " seconds of " + macroEventsList.get(macroEventsList.size()-1).getActionType());
+
+    }
+
+    public void runMacro() throws AWTException, InterruptedException {
+
+        Robot robot = new Robot();
+
+        for (int i = 0; i < macroEventsList.size(); i++) {
+            if (macroEventsList.get(i).getDelayTime() > 0) {
+                System.out.println("Delay of " + macroEventsList.get(i).getDelayTime() + " seconds");
+            } else if ((int) macroEventsList.get(i).getKey() != 0) {
+                System.out.println(macroEventsList.get(i).getActionType() + " '" + macroEventsList.get(i).getKey() + "'");
+                robot.delay(5000);
+                robot.keyPress(macroEventsList.get(i).getKey());
+            } else if (macroEventsList.get(i).getMouseButtonN() != 0) {
+                System.out.println(macroEventsList.get(i).getActionType() + " mouse button " + macroEventsList.get(i).getMouseButtonN() + " at (" + macroEventsList.get(i).getXCoord() + ", " + macroEventsList.get(i).getYCoord() + ")");
+            }
+        }
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource().equals(playButton)) {
+            try {
+                runMacro();
+            } catch (AWTException | InterruptedException awtException) {
+                awtException.printStackTrace();
+            }
+        }
 
         if (e.getSource().equals(remove)) {
             removeAction();
@@ -280,9 +294,9 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
             moveActionDown();
         }
 
-        if (e.getSource().equals(addMouseClick)) {
+        if (e.getSource().equals(addMouseAction)) {
             try {
-                addMouseClick(Integer.parseInt(xMouseCoord.getText()), Integer.parseInt(yMouseCoord.getText()), clickType.getSelectedIndex());
+                addMouseAction(mousePressOrRelease.getSelectedItem(), Integer.parseInt(xMouseCoord.getText()), Integer.parseInt(yMouseCoord.getText()), mouseButton.getSelectedIndex());
             } catch (Exception NumberFormatException) {
                 JDialog error = new JDialog(window, "Error!");
                 JLabel dialogLabel = new JLabel("Please enter valid mouse coordinates.", SwingConstants.CENTER);
@@ -290,10 +304,8 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
                 error.setSize(300,100);
                 error.setVisible(true);
             }
-        } else if (e.getSource().equals(addKeyPress)) {
-            addKeyPress(keyPressKey.getText().charAt(0));
-        } else if (e.getSource().equals(addKeyRelease)) {
-            addKeyRelease(keyReleaseKey.getText().charAt(0));
+        } else if (e.getSource().equals(addKeyAction)) {
+            addKeyAction(keyPressOrRelease.getSelectedItem(), keyActionKey.getText().charAt(0));
         } else if (e.getSource().equals(addDelay)) {
             addDelay(Double.parseDouble(delayTime.getText()));
         }
