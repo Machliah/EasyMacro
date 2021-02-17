@@ -3,10 +3,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.Scanner;
@@ -21,6 +18,7 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
 
     int selected;
     Object swapping;
+    boolean playing = false;
 
     JFrame window = new JFrame("EasyMacro");
 
@@ -262,28 +260,47 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
         Robot robot = new Robot();
 
         for (int i = 0; i < macroEventsList.size(); i++) {
+            if (!playing) {
+                break;
+            }
             if (macroEventsList.get(i).getDelayTime() > 0) {
-                System.out.println("Delay of " + macroEventsList.get(i).getDelayTime() + " seconds");
+                System.out.println("Delay of " + (int) Math.round(macroEventsList.get(i).getDelayTime() * 1000) + " milliseconds");
+                robot.delay((int) Math.round(macroEventsList.get(i).getDelayTime() * 1000));
             } else if ((int) macroEventsList.get(i).getKey() != 0) {
                 System.out.println(macroEventsList.get(i).getActionType() + " '" + macroEventsList.get(i).getKey() + "'");
-                robot.delay(5000);
-                robot.keyPress(macroEventsList.get(i).getKey());
+                if (macroEventsList.get(i).getActionType().equals("Press")) {
+                    robot.keyPress(KeyEvent.getExtendedKeyCodeForChar(macroEventsList.get(i).getKey()));
+                } else if (macroEventsList.get(i).getActionType().equals("Release")) {
+                    robot.keyRelease(KeyEvent.getExtendedKeyCodeForChar(macroEventsList.get(i).getKey()));
+                }
             } else if (macroEventsList.get(i).getMouseButtonN() != 0) {
                 System.out.println(macroEventsList.get(i).getActionType() + " mouse button " + macroEventsList.get(i).getMouseButtonN() + " at (" + macroEventsList.get(i).getXCoord() + ", " + macroEventsList.get(i).getYCoord() + ")");
+                robot.mouseMove(macroEventsList.get(i).getXCoord(), macroEventsList.get(i).getYCoord());
+                if (macroEventsList.get(i).getActionType().equals("Press")) {
+                    robot.mousePress(InputEvent.getMaskForButton(macroEventsList.get(i).getMouseButtonN()));
+                } else if (macroEventsList.get(i).getActionType().equals("Release")) {
+                    robot.mouseRelease(InputEvent.getMaskForButton(macroEventsList.get(i).getMouseButtonN()));
+                }
             }
         }
-
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource().equals(playButton)) {
-            try {
-                runMacro();
-            } catch (AWTException | InterruptedException awtException) {
-                awtException.printStackTrace();
+            if (!playing) {
+                playing = true;
+                try {
+                    runMacro();
+                } catch (AWTException | InterruptedException awtException) {
+                    awtException.printStackTrace();
+                }
+            } else {
+                return;
             }
+        } else if (e.getSource().equals(stopButton)) {
+            playing = false;
         }
 
         if (e.getSource().equals(remove)) {
