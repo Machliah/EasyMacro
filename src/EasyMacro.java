@@ -283,6 +283,7 @@ public class EasyMacro implements ActionListener, ListSelectionListener {
                 }
             }
         }
+        playing = false;
     }
 
     @Override
